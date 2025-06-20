@@ -171,13 +171,13 @@ document.addEventListener('DOMContentLoaded', function() {
     gastosGeneralesSlider.value = initialData.gastosGenerales;
     gastosGeneralesValue.textContent = `${initialData.gastosGenerales}%`;
     
-    costosOperativosSlider.addEventListener('input', function() {
+    costosOperativosSlider.addEventListener('change', function() {
         initialData.costosOperativos = parseFloat(this.value);
         costosOperativosValue.textContent = `${this.value}%`;
         updatePLCharts();
     });
-    
-    gastosGeneralesSlider.addEventListener('input', function() {
+
+    gastosGeneralesSlider.addEventListener('change', function() {
         initialData.gastosGenerales = parseFloat(this.value);
         gastosGeneralesValue.textContent = `${this.value}%`;
         updatePLCharts();
@@ -366,10 +366,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Funciones de actualización
     function updatePLCharts() {
         const metrics = calculateFinancialMetrics();
-        alert(`Gráficos de P&L actualizados con nuevos parámetros. EBITDA: $${metrics.ebitda.toLocaleString()}`);
-        // En una aplicación real, aquí se actualizarían los gráficos con los nuevos datos
+        updatePLTable();
+        updateRevenueByUnitChart(metrics);
+        updateTransactionsCharts();
     }
-
     function updateEntornoVariablesList() {
         const listContainer = document.querySelector('#entorno-content .list-group');
         listContainer.innerHTML = '';
@@ -457,28 +457,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize charts
     initializeCharts();
 
-    // Funciones para inicializar gráficos
+    // Nueva versión de initializeCharts()
     function initializeCharts() {
-        // Financial Summary Chart
+        // 1. Gráfico financiero principal (12 meses)
         const financialCtx = document.getElementById('financialChart').getContext('2d');
         window.financialChart = new Chart(financialCtx, {
             type: 'bar',
             data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
                 datasets: [
                     {
                         label: 'Revenue',
-                        data: [1450200, 1520500, 1610800, 1580300, 1620400, 1680500, 1720600, 1750700, 1800800, 1850900, 1901000, 1951100],
-                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        borderWidth: 1
+                        data: Array(12).fill().map((_,i) => 1000000 + (i * 50000)),
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)'
                     },
                     {
                         label: 'EBITDA',
-                        data: [619700, 654600, 699500, 685400, 702300, 728400, 745500, 759600, 782700, 805800, 828900, 852000],
-                        backgroundColor: 'rgba(46, 204, 113, 0.7)',
-                        borderColor: 'rgba(46, 204, 113, 1)',
-                        borderWidth: 1
+                        data: Array(12).fill().map((_,i) => 600000 + (i * 30000)),
+                        backgroundColor: 'rgba(46, 204, 113, 0.7)'
                     }
                 ]
             },
@@ -489,21 +485,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return '$' + (value / 1000).toFixed(0) + 'K';
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += '$' + context.raw.toLocaleString();
-                                return label;
+                                return '$' + (value/1000) + 'K';
                             }
                         }
                     }
@@ -511,50 +493,21 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Business Unit Distribution Chart
-        const businessUnitCtx = document.getElementById('businessUnitChart').getContext('2d');
-        window.businessUnitChart = new Chart(businessUnitCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Digital Payments', 'Instant Payments'],
-                datasets: [{
-                    data: [65, 35],
-                    backgroundColor: [
-                        'rgba(52, 152, 219, 0.7)',
-                        'rgba(231, 76, 60, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(52, 152, 219, 1)',
-                        'rgba(231, 76, 60, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
-
-        // Revenue by Unit Chart
-        const revenueByUnitCtx = document.getElementById('revenueByUnitChart').getContext('2d');
-        window.revenueByUnitChart = new Chart(revenueByUnitCtx, {
+        // 2. Gráfico de unidades de negocio (12 meses)
+        const revenueCtx = document.getElementById('revenueByUnitChart').getContext('2d');
+        window.revenueByUnitChart = new Chart(revenueCtx, {
             type: 'bar',
             data: {
-                labels: ['Ene', 'Feb', 'Mar'],
+                labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
                 datasets: [
                     {
                         label: 'Digital Payments',
-                        data: [942630, 988200, 1047020],
+                        data: Array(12).fill().map((_,i) => 700000 + (i * 40000)),
                         backgroundColor: 'rgba(52, 152, 219, 0.7)'
                     },
                     {
                         label: 'Instant Payments',
-                        data: [507570, 532300, 563780],
+                        data: Array(12).fill().map((_,i) => 300000 + (i * 20000)),
                         backgroundColor: 'rgba(231, 76, 60, 0.7)'
                     }
                 ]
@@ -566,21 +519,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return '$' + (value / 1000).toLocaleString() + 'K';
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += '$' + context.raw.toLocaleString();
-                                return label;
+                                return '$' + (value/1000) + 'K';
                             }
                         }
                     }
@@ -588,35 +527,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Digital Transactions Chart
-        const digitalTransactionsCtx = document.getElementById('digitalTransactionsChart').getContext('2d');
-        window.digitalTransactionsChart = new Chart(digitalTransactionsCtx, {
+        // 3. Gráfico de transacciones digitales (12 meses)
+        const digitalCtx = document.getElementById('digitalTransactionsChart').getContext('2d');
+        window.digitalTransactionsChart = new Chart(digitalCtx, {
             type: 'line',
             data: {
-                labels: ['Ene', 'Feb', 'Mar'],
+                labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
                 datasets: [{
-                    label: 'Transferencias Inmediatas Salientes',
-                    data: [520000, 545000, 578000],
-                    borderColor: 'rgba(52, 152, 219, 1)',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: 'Debines Salientes',
-                    data: [320000, 335000, 355000],
-                    borderColor: 'rgba(155, 89, 182, 1)',
-                    backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: 'Internet Banking',
-                    data: [280000, 295000, 312000],
-                    borderColor: 'rgba(46, 204, 113, 1)',
-                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                    tension: 0.3,
-                    fill: true
+                    label: 'Transferencias',
+                    data: Array(12).fill().map((_,i) => 500000 + (i * 20000)),
+                    borderColor: 'rgba(52, 152, 219, 1)'
                 }]
             },
             options: {
@@ -626,21 +546,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return (value / 1000).toLocaleString() + 'K';
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += context.raw.toLocaleString();
-                                return label;
+                                return (value/1000) + 'K';
                             }
                         }
                     }
@@ -648,35 +554,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Instant Transactions Chart
-        const instantTransactionsCtx = document.getElementById('instantTransactionsChart').getContext('2d');
-        window.instantTransactionsChart = new Chart(instantTransactionsCtx, {
+        // 4. Gráfico de transacciones instantáneas (12 meses)
+        const instantCtx = document.getElementById('instantTransactionsChart').getContext('2d');
+        window.instantTransactionsChart = new Chart(instantCtx, {
             type: 'line',
             data: {
-                labels: ['Ene', 'Feb', 'Mar'],
+                labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
                 datasets: [{
-                    label: 'Pagos con Transferencias (PCT)',
-                    data: [320000, 335000, 355000],
-                    borderColor: 'rgba(231, 76, 60, 1)',
-                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: 'Transferencias Entrantes PSPs',
-                    data: [180000, 190000, 201000],
-                    borderColor: 'rgba(241, 196, 15, 1)',
-                    backgroundColor: 'rgba(241, 196, 15, 0.1)',
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: 'Transferencias Salientes PSPs',
-                    data: [150000, 158000, 167000],
-                    borderColor: 'rgba(230, 126, 34, 1)',
-                    backgroundColor: 'rgba(230, 126, 34, 0.1)',
-                    tension: 0.3,
-                    fill: true
+                    label: 'Pagos Instantáneos',
+                    data: Array(12).fill().map((_,i) => 200000 + (i * 15000)),
+                    borderColor: 'rgba(231, 76, 60, 1)'
                 }]
             },
             options: {
@@ -686,342 +573,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return (value / 1000).toLocaleString() + 'K';
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += context.raw.toLocaleString();
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Entorno Radar Chart
-        const entornoRadarCtx = document.getElementById('entornoRadarChart').getContext('2d');
-        window.entornoRadarChart = new Chart(entornoRadarCtx, {
-            type: 'radar',
-            data: {
-                labels: ['Político', 'Económico', 'Social', 'Tecnológico', 'Ecológico', 'Legal'],
-                datasets: [{
-                    label: 'Impacto Actual',
-                    data: [4, 3, 2, 3, 1, 4],
-                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                    borderColor: 'rgba(52, 152, 219, 1)',
-                    borderWidth: 2,
-                    pointBackgroundColor: 'rgba(52, 152, 219, 1)'
-                },
-                {
-                    label: 'Impacto Promedio Industria',
-                    data: [3, 3, 3, 4, 2, 3],
-                    backgroundColor: 'rgba(155, 89, 182, 0.2)',
-                    borderColor: 'rgba(155, 89, 182, 1)',
-                    borderWidth: 2,
-                    pointBackgroundColor: 'rgba(155, 89, 182, 1)'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    r: {
-                        angleLines: {
-                            display: true
-                        },
-                        suggestedMin: 0,
-                        suggestedMax: 5,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                },
-                elements: {
-                    line: {
-                        tension: 0.1
-                    }
-                }
-            }
-        });
-
-        // Competitivo Radar Chart
-        const competitivoRadarCtx = document.getElementById('competitivoRadarChart').getContext('2d');
-        window.competitivoRadarChart = new Chart(competitivoRadarCtx, {
-            type: 'radar',
-            data: {
-                labels: ['Competencia', 'Nuevos Entrantes', 'Sustitutos', 'Proveedores', 'Clientes'],
-                datasets: [{
-                    label: 'Intensidad Actual',
-                    data: [5, 2, 3, 3, 4],
-                    backgroundColor: 'rgba(231, 76, 60, 0.2)',
-                    borderColor: 'rgba(231, 76, 60, 1)',
-                    borderWidth: 2,
-                    pointBackgroundColor: 'rgba(231, 76, 60, 1)'
-                },
-                {
-                    label: 'Intensidad Promedio',
-                    data: [4, 3, 3, 3, 3],
-                    backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                    borderColor: 'rgba(52, 152, 219, 1)',
-                    borderWidth: 2,
-                    pointBackgroundColor: 'rgba(52, 152, 219, 1)'
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    r: {
-                        angleLines: {
-                            display: true
-                        },
-                        suggestedMin: 0,
-                        suggestedMax: 5,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                },
-                elements: {
-                    line: {
-                        tension: 0.1
-                    }
-                }
-            }
-        });
-
-        // BCG Matrix Chart
-        const bcgMatrixCtx = document.getElementById('bcgMatrixChart').getContext('2d');
-        window.bcgMatrixChart = new Chart(bcgMatrixCtx, {
-            type: 'scatter',
-            data: {
-                datasets: [
-                    {
-                        label: 'Digital Payments',
-                        data: [{x: 15, y: 25}],
-                        backgroundColor: 'rgba(52, 152, 219, 1)',
-                        pointRadius: 15
-                    },
-                    {
-                        label: 'Instant Payments',
-                        data: [{x: 25, y: 40}],
-                        backgroundColor: 'rgba(231, 76, 60, 1)',
-                        pointRadius: 15
-                    },
-                    {
-                        label: 'QR Crédito',
-                        data: [{x: 40, y: 10}],
-                        backgroundColor: 'rgba(46, 204, 113, 1)',
-                        pointRadius: 15
-                    },
-                    {
-                        label: 'Prevención de Fraude',
-                        data: [{x: 5, y: 60}],
-                        backgroundColor: 'rgba(241, 196, 15, 1)',
-                        pointRadius: 15
-                    },
-                    {
-                        label: 'Extracción con Transferencias',
-                        data: [{x: 8, y: 15}],
-                        backgroundColor: 'rgba(155, 89, 182, 1)',
-                        pointRadius: 15
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Crecimiento de Mercado (%)'
-                        },
-                        min: 0,
-                        max: 50
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Participación de Mercado (%)'
-                        },
-                        min: 0,
-                        max: 70
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.parsed.x}% Crecimiento, ${context.parsed.y}% Participación`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // KPI Trend Chart
-        const kpiTrendCtx = document.getElementById('kpiTrendChart').getContext('2d');
-        window.kpiTrendChart = new Chart(kpiTrendCtx, {
-            type: 'line',
-            data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                datasets: [
-                    {
-                        label: 'EBITDA ($)',
-                        data: [619700, 654600, 699500, 685400, 702300, 728400, 745500, 759600, 782700, 805800, 828900, 852000],
-                        borderColor: 'rgba(46, 204, 113, 1)',
-                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                        tension: 0.3,
-                        yAxisID: 'y'
-                    },
-                    {
-                        label: 'ROI (%)',
-                        data: [18, 19, 20, 21, 22, 23, 22, 23, 24, 24, 24, 24],
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        tension: 0.3,
-                        yAxisID: 'y1'
-                    },
-                    {
-                        label: 'NPS',
-                        data: [58, 60, 62, 63, 64, 65, 66, 66, 67, 67, 68, 68],
-                        borderColor: 'rgba(155, 89, 182, 1)',
-                        backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                        tension: 0.3,
-                        yAxisID: 'y2'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: 'EBITDA ($)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + (value / 1000).toLocaleString() + 'K';
-                            }
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'ROI (%)'
-                        },
-                        grid: {
-                            drawOnChartArea: false
-                        },
-                        min: 0,
-                        max: 30
-                    },
-                    y2: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'NPS'
-                        },
-                        grid: {
-                            drawOnChartArea: false
-                        },
-                        min: 0,
-                        max: 100
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.dataset.label === 'EBITDA ($)') {
-                                    label += '$' + context.raw.toLocaleString();
-                                } else {
-                                    label += context.raw;
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Efficiency Chart
-        const efficiencyCtx = document.getElementById('efficiencyChart').getContext('2d');
-        window.efficiencyChart = new Chart(efficiencyCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Transferencias Inmediatas', 'Debines', 'PCT', 'Transferencias PSPs', 'Internet Banking'],
-                datasets: [{
-                    label: 'Eficiencia Operativa (%)',
-                    data: [95, 92, 89, 91, 94],
-                    backgroundColor: [
-                        'rgba(52, 152, 219, 0.7)',
-                        'rgba(155, 89, 182, 0.7)',
-                        'rgba(231, 76, 60, 0.7)',
-                        'rgba(241, 196, 15, 0.7)',
-                        'rgba(46, 204, 113, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(52, 152, 219, 1)',
-                        'rgba(155, 89, 182, 1)',
-                        'rgba(231, 76, 60, 1)',
-                        'rgba(241, 196, 15, 1)',
-                        'rgba(46, 204, 113, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.raw + '%';
+                                return (value/1000) + 'K';
                             }
                         }
                     }
@@ -1067,7 +619,53 @@ document.addEventListener('DOMContentLoaded', function() {
             toast.remove();
         }, 3000);
     }
-
+    function updatePLTable() {
+        const metrics = calculateFinancialMetrics();
+        const tableBody = document.querySelector('#pl-content tbody');
+    
+        tableBody.innerHTML = `
+            <tr>
+                <td><strong>Revenue Bruto</strong></td>
+                <td>$${(metrics.revenue / 12 * 1.0).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${(metrics.revenue / 12 * 1.05).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${(metrics.revenue / 12 * 1.1).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${metrics.revenue.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td class="text-success">+15%</td>
+            </tr>
+            <tr>
+                <td>Costos Operativos</td>
+                <td>$${(metrics.costos / 12 * 0.95).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${(metrics.costos / 12 * 1.0).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${(metrics.costos / 12 * 1.05).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${metrics.costos.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td class="text-danger">+8%</td>
+            </tr>
+            <tr>
+                <td>Gastos Generales</td>
+                <td>$${(metrics.gastos / 12 * 0.98).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${(metrics.gastos / 12 * 1.0).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${(metrics.gastos / 12 * 1.02).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${metrics.gastos.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td class="text-success">+3%</td>
+            </tr>
+            <tr class="table-active">
+                <td><strong>EBITDA</strong></td>
+                <td>$${(metrics.ebitda / 12 * 0.9).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${(metrics.ebitda / 12 * 1.0).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${(metrics.ebitda / 12 * 1.1).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td>$${metrics.ebitda.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
+                <td class="text-success">+22%</td>
+            </tr>
+            <tr>
+                <td>Margen EBITDA</td>
+                <td>${(metrics.margen * 0.98).toFixed(1)}%</td>
+                <td>${metrics.margen.toFixed(1)}%</td>
+                <td>${(metrics.margen * 1.02).toFixed(1)}%</td>
+                <td>${metrics.margen.toFixed(1)}%</td>
+                <td class="text-success">+2.5pp</td>
+            </tr>
+        `;
+    }    
     function updateEntornoRadarChart() {
         // Calcular promedios por categoría
         const categories = ['Político', 'Económico', 'Social', 'Tecnológico', 'Ecológico', 'Legal'];
