@@ -139,15 +139,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Botones del dashboard
+    // Botones del dashboard (sin los botones de "Compartir" y "Exportar")
     document.querySelectorAll('.btn-outline-secondary, .btn-outline-primary').forEach(btn => {
         btn.addEventListener('click', function() {
             const text = this.textContent.trim();
-            if (text === 'Compartir' || text.includes('Compartir')) {
-                alert('Función de compartir habilitada. En una aplicación real, esto abriría opciones para compartir.');
-            } else if (text === 'Exportar' || text.includes('Exportar')) {
-                alert('Los datos se han exportado correctamente.');
-            } else if (text === 'Actualizar' || text.includes('Actualizar')) {
+            if (text === 'Actualizar' || text.includes('Actualizar')) {
                 alert('Datos actualizados correctamente.');
                 // En una aplicación real, aquí se recargarían los datos
             } else if (text === 'Anual' || text === 'Mensual' || text === 'Trimestral') {
@@ -370,6 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateRevenueByUnitChart(metrics);
         updateTransactionsCharts();
     }
+
     function updateEntornoVariablesList() {
         const listContainer = document.querySelector('#entorno-content .list-group');
         listContainer.innerHTML = '';
@@ -870,164 +867,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-
-        // KPI Trend Chart
-        const kpiTrendCtx = document.getElementById('kpiTrendChart').getContext('2d');
-        window.kpiTrendChart = new Chart(kpiTrendCtx, {
-            type: 'line',
-            data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-                datasets: [
-                    {
-                        label: 'EBITDA ($)',
-                        data: [619700, 654600, 699500, 685400, 702300, 728400, 745500, 759600, 782700, 805800, 828900, 852000],
-                        borderColor: 'rgba(46, 204, 113, 1)',
-                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                        tension: 0.3,
-                        yAxisID: 'y'
-                    },
-                    {
-                        label: 'ROI (%)',
-                        data: [18, 19, 20, 21, 22, 23, 22, 23, 24, 24, 24, 24],
-                        borderColor: 'rgba(52, 152, 219, 1)',
-                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                        tension: 0.3,
-                        yAxisID: 'y1'
-                    },
-                    {
-                        label: 'NPS',
-                        data: [58, 60, 62, 63, 64, 65, 66, 66, 67, 67, 68, 68],
-                        borderColor: 'rgba(155, 89, 182, 1)',
-                        backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                        tension: 0.3,
-                        yAxisID: 'y2'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: 'EBITDA ($)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + (value / 1000).toLocaleString() + 'K';
-                            }
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'ROI (%)'
-                        },
-                        grid: {
-                            drawOnChartArea: false
-                        },
-                        min: 0,
-                        max: 30
-                    },
-                    y2: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'NPS'
-                        },
-                        grid: {
-                            drawOnChartArea: false
-                        },
-                        min: 0,
-                        max: 100
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.dataset.label === 'EBITDA ($)') {
-                                    label += '$' + context.raw.toLocaleString();
-                                } else {
-                                    label += context.raw;
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
-        // Efficiency Chart
-        const efficiencyCtx = document.getElementById('efficiencyChart').getContext('2d');
-        window.efficiencyChart = new Chart(efficiencyCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Transferencias Inmediatas', 'Debines', 'PCT', 'Transferencias PSPs', 'Internet Banking'],
-                datasets: [{
-                    label: 'Eficiencia Operativa (%)',
-                    data: [95, 92, 89, 91, 94],
-                    backgroundColor: [
-                        'rgba(52, 152, 219, 0.7)',
-                        'rgba(155, 89, 182, 0.7)',
-                        'rgba(231, 76, 60, 0.7)',
-                        'rgba(241, 196, 15, 0.7)',
-                        'rgba(46, 204, 113, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(52, 152, 219, 1)',
-                        'rgba(155, 89, 182, 1)',
-                        'rgba(231, 76, 60, 1)',
-                        'rgba(241, 196, 15, 1)',
-                        'rgba(46, 204, 113, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.raw + '%';
-                            }
-                        }
-                    }
-                }
-            }
-        });
     }
 
     function updateBCGMatrix() {
@@ -1067,99 +906,4 @@ document.addEventListener('DOMContentLoaded', function() {
             toast.remove();
         }, 3000);
     }
-    function updatePLTable() {
-        const metrics = calculateFinancialMetrics();
-        const tableBody = document.querySelector('#pl-content tbody');
-    
-        tableBody.innerHTML = `
-            <tr>
-                <td><strong>Revenue Bruto</strong></td>
-                <td>$${(metrics.revenue / 12 * 1.0).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${(metrics.revenue / 12 * 1.05).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${(metrics.revenue / 12 * 1.1).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${metrics.revenue.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td class="text-success">+15%</td>
-            </tr>
-            <tr>
-                <td>Costos Operativos</td>
-                <td>$${(metrics.costos / 12 * 0.95).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${(metrics.costos / 12 * 1.0).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${(metrics.costos / 12 * 1.05).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${metrics.costos.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td class="text-danger">+8%</td>
-            </tr>
-            <tr>
-                <td>Gastos Generales</td>
-                <td>$${(metrics.gastos / 12 * 0.98).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${(metrics.gastos / 12 * 1.0).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${(metrics.gastos / 12 * 1.02).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${metrics.gastos.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td class="text-success">+3%</td>
-            </tr>
-            <tr class="table-active">
-                <td><strong>EBITDA</strong></td>
-                <td>$${(metrics.ebitda / 12 * 0.9).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${(metrics.ebitda / 12 * 1.0).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${(metrics.ebitda / 12 * 1.1).toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td>$${metrics.ebitda.toLocaleString('es-AR', {maximumFractionDigits: 0})}</td>
-                <td class="text-success">+22%</td>
-            </tr>
-            <tr>
-                <td>Margen EBITDA</td>
-                <td>${(metrics.margen * 0.98).toFixed(1)}%</td>
-                <td>${metrics.margen.toFixed(1)}%</td>
-                <td>${(metrics.margen * 1.02).toFixed(1)}%</td>
-                <td>${metrics.margen.toFixed(1)}%</td>
-                <td class="text-success">+2.5pp</td>
-            </tr>
-        `;
-    }    
-    function updateEntornoRadarChart() {
-        // Calcular promedios por categoría
-        const categories = ['Político', 'Económico', 'Social', 'Tecnológico', 'Ecológico', 'Legal'];
-        const averages = categories.map(cat => {
-            const vars = initialData.entornoVariables.filter(v => v.categoria.toLowerCase() === cat.toLowerCase());
-            if (vars.length === 0) return 3; // Valor por defecto si no hay variables
-            return vars.reduce((sum, v) => sum + v.impacto, 0) / vars.length;
-        });
-        
-        // Actualizar gráfico
-        window.entornoRadarChart.data.datasets[0].data = averages;
-        window.entornoRadarChart.update();
-    }
-
-    function updateCompetitivoRadarChart() {
-        // Calcular promedios por fuerza
-        const forces = ['Competencia', 'Nuevos Entrantes', 'Sustitutos', 'Proveedores', 'Clientes'];
-        const averages = forces.map(force => {
-            const vars = initialData.competitivoVariables.filter(v => v.fuerza.toLowerCase() === force.toLowerCase().replace(' ', ''));
-            if (vars.length === 0) return 3; // Valor por defecto si no hay variables
-            return vars.reduce((sum, v) => sum + v.intensidad, 0) / vars.length;
-        });
-        
-        // Actualizar gráfico
-        window.competitivoRadarChart.data.datasets[0].data = averages;
-        window.competitivoRadarChart.update();
-    }
-
-    // Inicializar variables de entorno y competitivo con algunos datos de ejemplo
-    initialData.entornoVariables = [
-        { id: 1, categoria: 'Político', variable: 'Influencia gubernamental', impacto: 5, fecha: '2023-01-15' },
-        { id: 2, categoria: 'Tecnológico', variable: 'IoT - Pagos M2M', impacto: 3, fecha: '2023-02-20' },
-        { id: 3, categoria: 'Legal', variable: 'Nuevas normativas de licencias', impacto: 4, fecha: '2023-03-10' },
-        { id: 4, categoria: 'Económico', variable: 'Formalización de la economía', impacto: 2, fecha: '2023-01-25' }
-    ];
-
-    initialData.competitivoVariables = [
-        { id: 1, fuerza: 'Competencia', variable: 'Link', intensidad: 5, fecha: '2023-01-18' },
-        { id: 2, fuerza: 'Sustitutos', variable: 'Crypto', intensidad: 3, fecha: '2023-02-22' },
-        { id: 3, fuerza: 'Clientes', variable: 'Meli volumen', intensidad: 4, fecha: '2023-03-05' },
-        { id: 4, fuerza: 'Nuevos Entrantes', variable: 'Digitalización del sector', intensidad: 2, fecha: '2023-01-30' }
-    ];
-
-    // Inicializar listas y gráficos
-    updateEntornoVariablesList();
-    updateCompetitivoVariablesList();
-    updateEntornoRadarChart();
-    updateCompetitivoRadarChart();
 });
